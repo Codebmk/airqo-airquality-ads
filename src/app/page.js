@@ -196,7 +196,7 @@ const AirQualityDetails = (site) => {
                 : "w-[205.36px] h-[205.36px]"
             } justify-center items-center flex`}
           >
-          {getAQIIcon(selectedSite.pm2_5.aqi)}
+          {getAQIIcon(selectedSite.pm2_5.value)}
           </div>}
         </div>
       </div>
