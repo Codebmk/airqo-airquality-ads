@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "preserve",
+    "paths": {
+      "@utils/*": ["src/utils/*"],
+      "@icons/*": ["public/icons/*"],
+    },
+  },
+  "exclude": ["node_modules", ".next"],
+}
