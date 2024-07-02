@@ -94,7 +94,7 @@ const AirQualityDetails = (site) => {
   }, [site]);
 
   return (
-    <div className="h-4/5 min-h-[720px] w-full rounded-3xl px-[5%] pt-[3%] bg-blue-950 border-t-2 border-blue-950 overflow-x-hidden relative">
+    <div className={`${screenWidth>=2160 ? "h-full" : "h-4/5 min-h-[720px]"} w-full rounded-3xl px-[5%] pt-[3%] bg-blue-950 border-t-2 border-blue-950 overflow-x-hidden relative`}>
       <div className="w-full flex-col justify-start items-start gap-1 flex">
         <div className="flex-col justify-start items-start flex">
           <div className="flex justify-start items-start divide-x-2 divide-white">
