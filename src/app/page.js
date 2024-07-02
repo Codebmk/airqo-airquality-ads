@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 import { getAQDataApi } from "@components/utils/apis";
 import { useWindowSize } from "@components/utils/windowSize";
 import Image from "next/image";
-import GoodAir from '@icons/GoodAir';
-import Hazardous from '@icons/Hazardous';
-import Moderate from '@icons/Moderate';
-import Unhealthy from '@icons/Unhealthy';
-import UnhealthySG from '@icons/UnhealthySG';
-import VeryUnhealthy from '@icons/VeryUnhealthy';
-import UnknownAQ from '@icons/Invalid';
+import GoodAir from "@icons/GoodAir";
+import Hazardous from "@icons/Hazardous";
+import Moderate from "@icons/Moderate";
+import Unhealthy from "@icons/Unhealthy";
+import UnhealthySG from "@icons/UnhealthySG";
+import VeryUnhealthy from "@icons/VeryUnhealthy";
+import UnknownAQ from "@icons/Invalid";
 
 const BoxWrapper = ({ children }) => {
   const window = useWindowSize();
@@ -78,14 +78,13 @@ const AirQualityDetails = (site) => {
       AirQualityIcon = UnknownAQ;
     }
 
-    return <AirQualityIcon width={
-      screenWidth >= 2160
-        ? '480'
-        : '205.36'
-    } height={screenWidth >= 2160
-        ? '480'
-        : '205.36'}/>;
-  }
+    return (
+      <AirQualityIcon
+        width={screenWidth >= 2160 ? "480" : "205.36"}
+        height={screenWidth >= 2160 ? "480" : "205.36"}
+      />
+    );
+  };
 
   useEffect(() => {
     if (site) {
@@ -94,7 +93,11 @@ const AirQualityDetails = (site) => {
   }, [site]);
 
   return (
-    <div className={`${screenWidth>=2160 ? "h-full" : "h-4/5 min-h-[720px]"} w-full rounded-3xl px-[5%] pt-[3%] bg-blue-950 border-t-2 border-blue-950 overflow-x-hidden relative`}>
+    <div
+      className={`${
+        screenWidth >= 2160 ? "h-full" : "h-4/5 min-h-[720px]"
+      } w-full rounded-3xl px-[5%] pt-[3%] bg-blue-950 border-t-2 border-blue-950 overflow-x-hidden relative`}
+    >
       <div className="w-full flex-col justify-start items-start gap-1 flex">
         <div className="flex-col justify-start items-start flex">
           <div className="flex justify-start items-start divide-x-2 divide-white">
@@ -155,7 +158,7 @@ const AirQualityDetails = (site) => {
                 </div>
               </div>
             </div>
-            <div className="flex justify-start items-center gap-[11.18px]">
+            <div className="flex justify-start items-baseline gap-[11.18px]">
               <div
                 className={`text-center text-orange-400 ${
                   screenWidth >= 2160
@@ -189,15 +192,17 @@ const AirQualityDetails = (site) => {
               </div>
             </div>
           </div>
-          {selectedSite && selectedSite.pm2_5 && 
-          <div className={`${
-              screenWidth >= 2160
-                ? "w-[500px] h-[500px]"
-                : "w-[205.36px] h-[205.36px]"
-            } justify-center items-center flex`}
-          >
-          {getAQIIcon(selectedSite.pm2_5.value)}
-          </div>}
+          {selectedSite && selectedSite.pm2_5 && (
+            <div
+              className={`${
+                screenWidth >= 2160
+                  ? "w-[500px] h-[500px]"
+                  : "w-[205.36px] h-[205.36px]"
+              } justify-center items-center flex`}
+            >
+              {getAQIIcon(selectedSite.pm2_5.value)}
+            </div>
+          )}
         </div>
       </div>
       <div
@@ -213,31 +218,31 @@ const AirQualityDetails = (site) => {
           : ""}
       </div>
       <div className="absolute bottom-[2%] right-[5%] left-[5%]">
-      <hr className="pb-4 mt-4" />
-      <div className="h-[99.60px] flex-col justify-start items-start gap-4 flex">
-        <div className="justify-center items-center gap-5 inline-flex">
-          <div>
-            <Image
-              src="/marker.png"
-              alt="Image 0"
-              width={screenWidth >= 2160 ? 83 : 48}
-              height={screenWidth >= 2160 ? 83 : 48}
-              style={{ objectFit: "contain" }}
-            />
-          </div>
-          <div
-            className={`text-neutral-50 ${
-              screenWidth >= 2160
-                ? "text-[62.10px] leading-[79.85px]"
-                : "text-[40px]"
-            } font-bold font-['Inter']`}
-          >
-            {selectedSite && selectedSite.siteDetails
-              ? selectedSite.siteDetails.search_name
-              : "--"}
+        <hr className="pb-4 mt-4" />
+        <div className="h-[99.60px] flex-col justify-start items-start gap-4 flex">
+          <div className="justify-center items-center gap-5 inline-flex">
+            <div>
+              <Image
+                src="/marker.png"
+                alt="Image 0"
+                width={screenWidth >= 2160 ? 83 : 48}
+                height={screenWidth >= 2160 ? 83 : 48}
+                style={{ objectFit: "contain" }}
+              />
+            </div>
+            <div
+              className={`text-neutral-50 ${
+                screenWidth >= 2160
+                  ? "text-[62.10px] leading-[79.85px]"
+                  : "text-[40px]"
+              } font-bold font-['Inter']`}
+            >
+              {selectedSite && selectedSite.siteDetails
+                ? selectedSite.siteDetails.search_name
+                : "--"}
+            </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );
