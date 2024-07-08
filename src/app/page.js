@@ -16,7 +16,6 @@ const BoxWrapper = ({ children }) => {
   const window = useWindowSize();
   const screenWidth = window.width;
 
-  // display spinner for 3 seconds before loading data
   if (!screenWidth) {
     return (
       <div className="w-screen h-screen flex justify-center items-center">
@@ -24,7 +23,7 @@ const BoxWrapper = ({ children }) => {
       </div>
     );
   }
-  
+
   return (
     <div
       className={`${
