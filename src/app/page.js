@@ -11,6 +11,7 @@ import UnhealthySG from "@icons/UnhealthySG";
 import VeryUnhealthy from "@icons/VeryUnhealthy";
 import UnknownAQ from "@icons/Invalid";
 import WindIcon from "@icons/WindIcon";
+import AnalyticsQR from "public/analytics_qrcode.png"
 
 const BoxWrapper = ({ children }) => {
   const window = useWindowSize();
@@ -26,11 +27,7 @@ const BoxWrapper = ({ children }) => {
 
   return (
     <div
-      className={`${
-        screenWidth >= 2160
-          ? "w-screen h-screen overflow-hidden"
-          : "w-screen min-h-screen h-full overflow-x-hidden"
-      } p-8 bg-blue-600 flex flex-col gap-2`}
+      className={`w-screen h-screen overflow-hidden bg-blue-600 flex flex-col gap-2`}
     >
       {children}
     </div>
@@ -104,12 +101,11 @@ const AirQualityDetails = (site) => {
 
   return (
     <div
-      className={`${
-        screenWidth >= 2160 ? "h-full" : "h-4/5 min-h-[620px]"
-      } w-full rounded-3xl px-[5%] pt-[3%] bg-blue-950 border-t-2 border-blue-950 overflow-hidden relative`}
+      className={`w-full h-full px-[5%] pt-[3%] bg-blue-950 border-t-2 border-blue-950 overflow-hidden relative`}
     >
-      <div className="w-full flex-col justify-start items-start gap-1 flex">
-        <div className="flex-col justify-start items-start flex">
+      <div className="w-full h-[75%] flex justify-between items-start gap-1 relative">
+        <div className="flex justify-between items-start w-full">
+        <div className="w-full">
           <div className="flex justify-start items-start divide-x-2 divide-white">
             <div
               className={`text-neutral-50 font-medium font-['Inter'] pr-5 leading-tight`}
@@ -138,8 +134,6 @@ const AirQualityDetails = (site) => {
           >
             Air Quality
           </div>
-        </div>
-        <div className="w-full justify-between items-center flex py-[1%]">
           <div className="flex-col justify-between items-start w-full">
             <div className="self-stretch flex-col justify-start items-start flex">
               <div className="flex justify-start items-center gap-4">
@@ -194,6 +188,8 @@ const AirQualityDetails = (site) => {
               </div>
             </div>
           </div>
+          </div>
+          <div className="w-full justify-end items-start flex py-[1%]">
           {selectedSite && selectedSite.pm2_5 && (
             <div
               className={`${`w-[${screenWidth * 0.20}px] h-[${screenWidth * 0.20}px]`} justify-center items-center flex`}
@@ -202,10 +198,19 @@ const AirQualityDetails = (site) => {
             </div>
           )}
         </div>
+        </div>
       </div>
-      <div className="absolute bottom-[7%] right-[5%] left-[5%]">
+      <div style={{
+          position: "absolute",
+          bottom: "5%",
+          right: "10%"
+        }}>
+        <div style={{fontSize: `${screenWidth * 0.02}px`, color:"#fff", fontWeight: "600"}}>SCAN ME</div>
+      <Image src={AnalyticsQR} width={screenWidth*0.1} height={screenWidth*0.1} alt="analytics qr code" />
+      </div>
+      <div className="h-auto w-full">
       <div
-        className={`max-w-[60%] w-full text-neutral-50 leading-snug font-semibold font-['Inter']`}
+        className={`w-full text-neutral-50 leading-snug font-semibold font-['Inter']`}
         style={{fontSize: `${screenWidth * 0.02}px`}}
       >
         {selectedSite && selectedSite.aqi_category
@@ -286,7 +291,7 @@ export default function Home() {
   return (
     <BoxWrapper>
       <AirQualityDetails site={selectedSite} />
-      <Footer />
+      {/* <Footer /> */}
     </BoxWrapper>
   );
 }
