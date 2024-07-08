@@ -15,6 +15,16 @@ import WindIcon from "@icons/WindIcon";
 const BoxWrapper = ({ children }) => {
   const window = useWindowSize();
   const screenWidth = window.width;
+
+  // display spinner for 3 seconds before loading data
+  if (!screenWidth) {
+    return (
+      <div className="w-screen h-screen flex justify-center items-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+  
   return (
     <div
       className={`${
@@ -92,8 +102,6 @@ const AirQualityDetails = (site) => {
       setSelectedSite(site.site);
     }
   }, [site]);
-
-  console.log(screenWidth * 0.04)
 
   return (
     <div
