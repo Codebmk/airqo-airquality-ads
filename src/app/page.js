@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getAQDataApi } from "@components/utils/apis";
-import { useWindowSize } from "@components/utils/windowSize";
+import { getAQDataApi } from "@utils/apis";
+import { useWindowSize } from "@utils/windowSize";
 import Image from "next/image";
 import GoodAir from "@icons/GoodAir";
 import Hazardous from "@icons/Hazardous";
