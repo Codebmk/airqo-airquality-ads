@@ -281,7 +281,7 @@ export default function Home() {
     fetchData();
     const interval = setInterval(() => {
       fetchData();
-    }, 100000);
+    }, 10000);
 
     return () => {
       clearInterval(interval);
