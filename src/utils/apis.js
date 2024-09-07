@@ -7,6 +7,7 @@ const fetchWithToken = async (url, token) => {
 };
 
 export const getAQDataApi = async (token) => {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/devices/measurements/cohorts/66dbf9f0068a5300139b41c5?token=${token}`;
+  // https://api.airqo.net/api/v2/devices/measurements/cohorts/66dbf9f0068a5300139b41c5
+  const url = `https://api.airqo.net/api/v2/devices/measurements/cohorts/66dbf9f0068a5300139b41c5?token=${token}`;
   return fetchWithToken(url, token);
 };
