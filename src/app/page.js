@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getAQDataApi, getCohorts, getDailyPredictions } from "@utils/apis";
+import { getAQDataApi, getCohorts, getDailyPredictions, getGridsSummary, getGridMeasurements } from "@utils/apis";
 import { useWindowSize } from "@utils/windowSize";
 import { useParams, useRouter } from 'next/navigation';
 import Image from "next/image";
@@ -55,7 +55,7 @@ const Footer = () => {
   );
 };
 
-const AirQualityDetails = ({ site, predictions, isPredictionsLoading, cohortName }) => {
+const AirQualityDetails = ({ data, predictions, isPredictionsLoading, name, type }) => {
   const window = useWindowSize();
   const screenWidth = Math.floor(window.width);
 
@@ -155,7 +155,7 @@ const AirQualityDetails = ({ site, predictions, isPredictionsLoading, cohortName
               minute: "2-digit",
             })}
           </div>
-          <div>Cohort: {cohortName}</div>
+          <div className="capitalize">{name}</div>
         </div>
       </div>
       <div className="w-full h-[67%] flex justify-between items-start gap-1 relative mt-6">
@@ -188,8 +188,8 @@ const AirQualityDetails = ({ site, predictions, isPredictionsLoading, cohortName
                   className={`text-center text-orange-400 font-extrabold font-['Inter']`}
                   style={{fontSize: `${screenWidth * 0.08}px`}}
                 >
-                  {site && site.pm2_5
-                    ? site.pm2_5.value.toFixed(2)
+                  {data && data.pm2_5
+                    ? data.pm2_5.value.toFixed(2)
                     : "--"}
                 </div>
                 <div className="text-right">
@@ -211,11 +211,11 @@ const AirQualityDetails = ({ site, predictions, isPredictionsLoading, cohortName
             </div>
           </div>
           <div className="w-full justify-end items-start flex py-[1%]">
-            {site && site.pm2_5 && (
+            {data && data.pm2_5 && (
               <div
                 className={`w-[${screenWidth * 0.20}px] h-[${screenWidth * 0.20}px] justify-center items-center flex`}
               >
-                {getAQIIcon(site.pm2_5.value, screenWidth * 0.18)}
+                {getAQIIcon(data.pm2_5.value, screenWidth * 0.18)}
               </div>
             )}
           </div>
@@ -234,8 +234,8 @@ const AirQualityDetails = ({ site, predictions, isPredictionsLoading, cohortName
           className={`w-full text-neutral-50 leading-snug font-semibold font-['Inter']`}
           style={{fontSize: `${screenWidth * 0.02}px`}}
         >
-          {site && site.aqi_category
-            ? getAQIMessage(site.aqi_category)
+          {data && data.aqi_category
+            ? getAQIMessage(data.aqi_category)
             : ""}
         </div>
         <hr className="pb-4 mt-5" />
@@ -254,8 +254,8 @@ const AirQualityDetails = ({ site, predictions, isPredictionsLoading, cohortName
               className={`text-neutral-50 leading-loose font-bold font-['Inter']`}
               style={{fontSize: `${screenWidth * 0.02}px`}}
             >
-              {site && site.deviceDetails
-                ? site.deviceDetails.name
+              {data && data.siteDetails
+                ? data.siteDetails.name
                 : "--"}
             </div>
           </div>
@@ -266,106 +266,131 @@ const AirQualityDetails = ({ site, predictions, isPredictionsLoading, cohortName
 };
 
 export default function Home() {
-  const [selectedSite, setSelectedSite] = useState(null);
-  const [cohortId, setCohortId] = useState(null);
-  const [cohortName, setCohortName] = useState("");
+  const [selectedData, setSelectedData] = useState(null);
+  const [id, setId] = useState(null);
+  const [name, setName] = useState("");
   const [predictions, setPredictions] = useState(null);
   const [isPredictionsLoading, setIsPredictionsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [type, setType] = useState(null);
   const params = useParams();
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchCohortId = async () => {
-      const accessToken = process.env.NEXT_PUBLIC_API_TOKEN;
-      try {
-        const response = await getCohorts(accessToken);
-        if (response.success && Array.isArray(response.cohorts)) {
-          const cohorts = response.cohorts;
-          const cohortName = params.cohort || ''; 
-
-          let matchedCohort;
-          if (cohortName) {
-            matchedCohort = cohorts.find(cohort => cohort.name.toLowerCase() === cohortName.toLowerCase());
-          } else {
-            matchedCohort = cohorts.find(cohort => cohort.name.toLowerCase() === "car_free_day_demo");
-          }
-
-          if (matchedCohort) {
-            console.log("Matched cohort:", matchedCohort);
-            setCohortId(matchedCohort._id);
-            setCohortName(matchedCohort.name);
-          } else {
-            console.error(`Cohort "${cohortName || 'car_free_day_demo'}" not found`);
-            const defaultCohort = cohorts.find(cohort => cohort.name.toLowerCase() === "car_free_day_demo");
-            if (defaultCohort) {
-              setCohortId(defaultCohort._id);
-              setCohortName(defaultCohort.name);
-              router.push('/');
-            }
-          }
-        } else {
-          console.error("Invalid response format from getCohorts");
-        }
-      } catch (error) {
-        console.error("Error fetching cohorts:", error);
-      }
-    };
-
-    fetchCohortId();
-  }, [params.cohort, router]);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!cohortId) return;
-
+      const accessToken = process.env.NEXT_PUBLIC_API_TOKEN;
       try {
-        const accessToken = process.env.NEXT_PUBLIC_API_TOKEN;
-        const response = await getAQDataApi(accessToken, cohortId);
-        if (response.measurements && response.measurements.length > 0) {
-          let availableSites = response.measurements.filter(site => site.pm2_5 && site.pm2_5.value);
+        if (params.params && params.params.length === 2) {
+          const [paramType, paramName] = params.params;
+          setType(paramType.toLowerCase() === 'cohort' ? 'Cohort' : 'Grid');
           
-          if (availableSites.length === 0) {
-            setError(`No measurements found for any device in ${cohortName}`);
-            return;
-          }
-
-          const randomIndex = Math.floor(Math.random() * availableSites.length);
-          let randomSite = availableSites[randomIndex];
-          setSelectedSite(randomSite);
-          setError(null);
-
-          if (randomSite.site_id) {
-            setIsPredictionsLoading(true);
-            const forecasts = await getDailyPredictions(accessToken, randomSite.site_id);
-            setPredictions(forecasts || []);
-            setIsPredictionsLoading(false);
+          if (paramType.toLowerCase() === 'cohort') {
+            const response = await getCohorts(accessToken);
+            if (response.success && Array.isArray(response.cohorts)) {
+              const matchedCohort = response.cohorts.find(cohort => cohort.name.toLowerCase() === paramName.toLowerCase());
+              if (matchedCohort) {
+                setId(matchedCohort._id);
+                setName(matchedCohort.name);
+              } else {
+                throw new Error(`Cohort "${paramName}" not found`);
+              }
+            } else {
+              throw new Error("Invalid response format from getCohorts");
+            }
+          } else if (paramType.toLowerCase() === 'grid') {
+            const gridsSummary = await getGridsSummary(accessToken);
+            const matchedGrid = gridsSummary.grids.find(grid => grid.name.toLowerCase() === paramName.toLowerCase());
+            if (matchedGrid) {
+              setId(matchedGrid._id);
+              setName(matchedGrid.name);
+            } else {
+              throw new Error(`Grid "${paramName}" not found`);
+            }
           }
         } else {
-          console.log("No measurements found for cohort:", cohortId);
-          setError(`No measurements found for ${cohortName}`);
+          // Default to car_free_day_demo cohort if no params
+          setType('Cohort');
+          const response = await getCohorts(accessToken);
+          const defaultCohort = response.cohorts.find(cohort => cohort.name.toLowerCase() === "car_free_day_demo");
+          if (defaultCohort) {
+            setId(defaultCohort._id);
+            setName(defaultCohort.name);
+          } else {
+            throw new Error("Default cohort not found");
+          }
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        setPredictions([]);
-        setIsPredictionsLoading(false);
-        setError("An error occurred while fetching data");
+        setError(error.message);
       }
     };
 
-    if (cohortId) {
-      fetchData();
-      const interval = setInterval(fetchData, 20000);
+    fetchData();
+  }, [params.params]);
+
+  useEffect(() => {
+    const fetchMeasurements = async () => {
+      if (!id || !type) return;
+
+      try {
+        const accessToken = process.env.NEXT_PUBLIC_API_TOKEN;
+        let response;
+        if (type === 'Cohort') {
+          response = await getAQDataApi(accessToken, id);
+          if (response.measurements && response.measurements.length > 0) {
+            const availableSites = response.measurements.filter(site => site.pm2_5 && site.pm2_5.value);
+            if (availableSites.length === 0) {
+              throw new Error(`No measurements found for any device in ${name}`);
+            }
+            const randomSite = availableSites[Math.floor(Math.random() * availableSites.length)];
+            setSelectedData(randomSite);
+            if (randomSite.site_id) {
+              setIsPredictionsLoading(true);
+              const forecasts = await getDailyPredictions(accessToken, randomSite.site_id);
+              setPredictions(forecasts || []);
+              setIsPredictionsLoading(false);
+            }
+          } else {
+            throw new Error(`No measurements found for ${name}`);
+          }
+        } else if (type === 'Grid') {
+          response = await getGridMeasurements(accessToken, id);
+          if (response.success && response.measurements && response.measurements.length > 0) {
+            const availableSites = response.measurements.filter(site => site.pm2_5 && site.pm2_5.value);
+            if (availableSites.length === 0) {
+              throw new Error(`No measurements found for any device in grid ${name}`);
+            }
+            const randomSite = availableSites[Math.floor(Math.random() * availableSites.length)];
+            setSelectedData(randomSite);
+            if (randomSite.site_id) {
+              setIsPredictionsLoading(true);
+              const forecasts = await getDailyPredictions(accessToken, randomSite.site_id);
+              setPredictions(forecasts || []);
+              setIsPredictionsLoading(false);
+            }
+          } else {
+            throw new Error(`No measurements found for grid ${name}`);
+          }
+        }
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching measurements:", error);
+        setError(error.message);
+      }
+    };
+
+    if (id && type) {
+      fetchMeasurements();
+      const interval = setInterval(fetchMeasurements, 20000);
       return () => clearInterval(interval);
     }
-  }, [cohortId, cohortName]);
+  }, [id, type, name]);
 
   if (error) {
     return (
       <div className="w-screen h-screen flex flex-col justify-center items-center bg-blue-950 text-white">
         <Image src={OopsSVG} alt="Error" width={200} height={200} />
         <h1 className="text-2xl font-bold mt-4">{error}</h1>
-        <p className="mt-2">Please try again later or select a different cohort.</p>
+        <p className="mt-2">Please try again later or select a different {type.toLowerCase()}.</p>
       </div>
     );
   }
@@ -373,12 +398,12 @@ export default function Home() {
   return (
     <BoxWrapper>
       <AirQualityDetails 
-        site={selectedSite} 
+        data={selectedData} 
         predictions={predictions} 
         isPredictionsLoading={isPredictionsLoading}
-        cohortName={cohortName}
+        name={name}
+        type={type}
       />
-      {/* <Footer /> */}
     </BoxWrapper>
   );
 }
