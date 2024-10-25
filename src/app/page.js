@@ -117,7 +117,7 @@ const AirQualityDetails = ({ data, predictions, isPredictionsLoading, name, type
               }`}
             >
               <span className="font-bold" style={{fontSize: `${screenWidth * 0.012}px`}}>{days[dayIndex]}</span>
-              <span style={{fontSize: `${screenWidth * 0.011}px`}}>{date.getDate()}</span>
+              <span style={{fontSize: `${screenWidth * 0.011}px`}}>{forecast && forecast.pm2_5.toFixed(1)}</span>
               {isPredictionsLoading ? (
                 <div className="animate-pulse bg-gray-500 rounded-full mt-1" style={{width: `${screenWidth * 0.03}px`, height: `${screenWidth * 0.03}px`}}></div>
               ) : forecast ? (
