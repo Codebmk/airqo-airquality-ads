@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getAQDataApi, getCohorts } from "@utils/apis";
+import { getAQDataApi, getCohorts, getDailyPredictions } from "@utils/apis";
 import { useWindowSize } from "@utils/windowSize";
-import { usePathname } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from "next/image";
 import GoodAir from "@icons/GoodAir";
 import Hazardous from "@icons/Hazardous";
@@ -13,6 +13,7 @@ import VeryUnhealthy from "@icons/VeryUnhealthy";
 import UnknownAQ from "@icons/Invalid";
 import WindIcon from "@icons/WindIcon";
 import AnalyticsQR from "public/analytics_qrcode.png"
+import OopsSVG from "public/Oops.svg";
 
 const BoxWrapper = ({ children }) => {
   const window = useWindowSize();
@@ -54,7 +55,7 @@ const Footer = () => {
   );
 };
 
-const AirQualityDetails = ({ site }) => {
+const AirQualityDetails = ({ site, predictions, isPredictionsLoading, cohortName }) => {
   const window = useWindowSize();
   const screenWidth = Math.floor(window.width);
 
@@ -66,7 +67,7 @@ const AirQualityDetails = ({ site }) => {
     }
   };
 
-  const getAQIIcon = (reading) => {
+  const getAQIIcon = (reading, size) => {
     let AirQualityIcon = null;
 
     if (reading >= 0 && reading <= 12) {
@@ -87,9 +88,42 @@ const AirQualityDetails = ({ site }) => {
 
     return (
       <AirQualityIcon
-        width={`${screenWidth * 0.18}`}
-        height={`${screenWidth * 0.18}`}
+        width={`${size}px`}
+        height={`${size}px`}
       />
+    );
+  };
+
+  const renderPredictions = () => {
+    const days = ['S', 'S', 'M', 'T', 'W', 'T', 'F'];
+    const today = new Date().getDay();
+
+    return (
+      <div className="absolute top-full left-0 mt-4 flex items-center justify-between w-full">
+        {[...Array(7)].map((_, index) => {
+          const dayIndex = (today + index) % 7;
+          const isToday = index === 0;
+          const forecast = predictions && predictions[index];
+          const date = forecast ? new Date(forecast.time) : new Date();
+          date.setDate(date.getDate() + index);
+
+          return (
+            <div key={index} className={`flex flex-col items-center ${isToday ? 'bg-blue-500 text-white rounded-md p-1' : 'text-white'}`}>
+              <span className="text-sm font-bold">{days[dayIndex]}</span>
+              <span className="text-sm">{date.getDate()}</span>
+              {isPredictionsLoading ? (
+                <div className="w-10 h-10 animate-pulse bg-gray-500 rounded-full mt-1"></div>
+              ) : forecast ? (
+                <div className="mt-1">{getAQIIcon(forecast.pm2_5, screenWidth * 0.03)}</div>
+              ) : (
+                <div className="mt-1">
+                  <UnknownAQ width={`${screenWidth * 0.03}px`} height={`${screenWidth * 0.03}px`} />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     );
   };
 
@@ -97,38 +131,30 @@ const AirQualityDetails = ({ site }) => {
     <div
       className={`w-full h-full px-[5%] pt-[3%] bg-blue-950 border-t-2 border-blue-950 overflow-hidden relative`}
     >
-      <div className="w-full h-[75%] flex justify-between items-start gap-1 relative">
+    <div className="absolute top-0 left-0 w-full bg-blue-900 py-2 px-4 z-10">
+        <div className="flex justify-between items-center text-white" style={{fontSize: `${screenWidth * 0.012}px`}}>
+          <div className="font-bold">Air Quality</div>
+          <div>
+            {new Date().toLocaleDateString([], {
+              weekday: "short",
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
+          </div>
+          <div>
+            {new Date().toLocaleTimeString([], {
+              hour: "numeric",
+              minute: "2-digit",
+            })}
+          </div>
+          <div>Cohort: {cohortName}</div>
+        </div>
+      </div>
+      <div className="w-full h-[75%] flex justify-between items-start gap-1 relative mt-6">
         <div className="flex justify-between items-start w-full">
           <div className="w-full">
-            <div className="flex justify-start items-start divide-x-2 divide-white">
-              <div
-                className={`text-neutral-50 font-medium font-['Inter'] pr-5 leading-tight`}
-                style={{fontSize: `${screenWidth * 0.015}px`}}
-              >
-                {new Date().toLocaleDateString([], {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-              </div>
-              <div
-                className={`text-neutral-50 font-medium font-['Inter'] leading-tight pl-5`}
-                style={{fontSize: `${screenWidth * 0.015}px`}}
-              >
-                {new Date().toLocaleTimeString([], {
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
-              </div>
-            </div>
-            <div
-              className={`text-neutral-50 font-bold font-['Inter'] leading-tight`}
-              style={{fontSize: `${screenWidth * 0.05}px`}}
-            >
-              Air Quality
-            </div>
-            <div className="flex-col justify-between items-start w-full">
+            <div className="flex-col justify-between items-start w-full relative">
               <div className="self-stretch flex-col justify-start items-start flex">
                 <div className="flex justify-start items-center gap-4">
                   <div
@@ -157,7 +183,7 @@ const AirQualityDetails = ({ site }) => {
                   </div>
                 </div>
               </div>
-              <div className="flex justify-start items-baseline gap-[11.18px]">
+              <div className="flex justify-start items-baseline gap-[11.18px] relative">
                 <div
                   className={`text-center text-orange-400 font-extrabold font-['Inter']`}
                   style={{fontSize: `${screenWidth * 0.08}px`}}
@@ -180,15 +206,16 @@ const AirQualityDetails = ({ site }) => {
                     3
                   </span>
                 </div>
+                {renderPredictions()}
               </div>
             </div>
           </div>
           <div className="w-full justify-end items-start flex py-[1%]">
             {site && site.pm2_5 && (
               <div
-                className={`${`w-[${screenWidth * 0.20}px] h-[${screenWidth * 0.20}px]`} justify-center items-center flex`}
+                className={`w-[${screenWidth * 0.20}px] h-[${screenWidth * 0.20}px] justify-center items-center flex`}
               >
-                {getAQIIcon(site.pm2_5.value)}
+                {getAQIIcon(site.pm2_5.value, screenWidth * 0.18)}
               </div>
             )}
           </div>
@@ -200,7 +227,7 @@ const AirQualityDetails = ({ site }) => {
           right: "10%"
         }}>
         <div style={{fontSize: `${screenWidth * 0.02}px`, color:"#fff", fontWeight: "600"}}>SCAN ME</div>
-      <Image src={AnalyticsQR} width={screenWidth*0.1} height={screenWidth*0.1} alt="analytics qr code" />
+        <Image src={AnalyticsQR} width={screenWidth*0.1} height={screenWidth*0.1} alt="analytics qr code" />
       </div>
       <div className="h-auto w-full">
         <div
@@ -241,7 +268,12 @@ const AirQualityDetails = ({ site }) => {
 export default function Home() {
   const [selectedSite, setSelectedSite] = useState(null);
   const [cohortId, setCohortId] = useState(null);
-  const pathname = usePathname();
+  const [cohortName, setCohortName] = useState("");
+  const [predictions, setPredictions] = useState(null);
+  const [isPredictionsLoading, setIsPredictionsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const params = useParams();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCohortId = async () => {
@@ -250,21 +282,27 @@ export default function Home() {
         const response = await getCohorts(accessToken);
         if (response.success && Array.isArray(response.cohorts)) {
           const cohorts = response.cohorts;
-          const cohortName = pathname.slice(1); // Remove the leading '/'
-          
+          const cohortName = params.cohort || ''; 
+
           let matchedCohort;
           if (cohortName) {
             matchedCohort = cohorts.find(cohort => cohort.name.toLowerCase() === cohortName.toLowerCase());
           } else {
-            // If no cohort name is provided, use the default "car_free_day_demo"
             matchedCohort = cohorts.find(cohort => cohort.name.toLowerCase() === "car_free_day_demo");
           }
 
           if (matchedCohort) {
+            console.log("Matched cohort:", matchedCohort);
             setCohortId(matchedCohort._id);
+            setCohortName(matchedCohort.name);
           } else {
             console.error(`Cohort "${cohortName || 'car_free_day_demo'}" not found`);
-            // You might want to handle this error case, perhaps by setting a fallback cohort ID
+            const defaultCohort = cohorts.find(cohort => cohort.name.toLowerCase() === "car_free_day_demo");
+            if (defaultCohort) {
+              setCohortId(defaultCohort._id);
+              setCohortName(defaultCohort.name);
+              router.push('/');
+            }
           }
         } else {
           console.error("Invalid response format from getCohorts");
@@ -275,7 +313,7 @@ export default function Home() {
     };
 
     fetchCohortId();
-  }, [pathname]);
+  }, [params.cohort, router]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -285,43 +323,61 @@ export default function Home() {
         const accessToken = process.env.NEXT_PUBLIC_API_TOKEN;
         const response = await getAQDataApi(accessToken, cohortId);
         if (response.measurements && response.measurements.length > 0) {
-          // choose random site
-          const randomIndex = Math.floor(
-            Math.random() * response.measurements.length
-          );
-          let randomSite = response.measurements[randomIndex];
-          if (!selectedSite) {
-            setSelectedSite(randomSite);
-          } else {
-            while (randomSite.device_id === selectedSite?.device_id) {
-              randomSite =
-                response.measurements[
-                  Math.floor(Math.random() * response.measurements.length)
-                ];
-            }
+          let availableSites = response.measurements.filter(site => site.pm2_5 && site.pm2_5.value);
+          
+          if (availableSites.length === 0) {
+            setError(`No measurements found for any device in ${cohortName}`);
+            return;
           }
+
+          const randomIndex = Math.floor(Math.random() * availableSites.length);
+          let randomSite = availableSites[randomIndex];
           setSelectedSite(randomSite);
+          setError(null);
+
+          if (randomSite.site_id) {
+            setIsPredictionsLoading(true);
+            const forecasts = await getDailyPredictions(accessToken, randomSite.site_id);
+            setPredictions(forecasts || []);
+            setIsPredictionsLoading(false);
+          }
+        } else {
+          console.log("No measurements found for cohort:", cohortId);
+          setError(`No measurements found for ${cohortName}`);
         }
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching data:", error);
+        setPredictions([]);
+        setIsPredictionsLoading(false);
+        setError("An error occurred while fetching data");
       }
     };
 
     if (cohortId) {
       fetchData();
-      const interval = setInterval(() => {
-        fetchData();
-      }, 10000);
-
-      return () => {
-        clearInterval(interval);
-      };
+      const interval = setInterval(fetchData, 20000);
+      return () => clearInterval(interval);
     }
-  }, [cohortId]);
+  }, [cohortId, cohortName]);
+
+  if (error) {
+    return (
+      <div className="w-screen h-screen flex flex-col justify-center items-center bg-blue-950 text-white">
+        <Image src={OopsSVG} alt="Error" width={200} height={200} />
+        <h1 className="text-2xl font-bold mt-4">{error}</h1>
+        <p className="mt-2">Please try again later or select a different cohort.</p>
+      </div>
+    );
+  }
 
   return (
     <BoxWrapper>
-      <AirQualityDetails site={selectedSite} />
+      <AirQualityDetails 
+        site={selectedSite} 
+        predictions={predictions} 
+        isPredictionsLoading={isPredictionsLoading}
+        cohortName={cohortName}
+      />
       {/* <Footer /> */}
     </BoxWrapper>
   );

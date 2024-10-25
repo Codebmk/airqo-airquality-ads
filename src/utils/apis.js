@@ -1,4 +1,3 @@
-
 const fetchWithAccessToken = async (url) => {
   const res = await fetch(url, {
     method: "GET",
@@ -19,4 +18,10 @@ export const getAQDataApi = async (token, cohortId) => {
 export const getCohorts = async (token) => {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/devices/cohorts/summary?token=${token}`;
   return fetchWithAccessToken(url);
+};
+
+export const getDailyPredictions = async (token, siteId) => {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/predict/daily-forecast?site_id=${siteId}&token=${token}`;
+  const response = await fetchWithAccessToken(url);
+  return response.forecasts; // Return the forecasts array directly
 };
