@@ -95,7 +95,7 @@ const AirQualityDetails = ({ data, predictions, isPredictionsLoading, name, type
   };
 
   const renderPredictions = () => {
-    const days = ['S', 'S', 'M', 'T', 'W', 'T', 'F'];
+    const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
     const today = new Date().getDay();
 
     return (
