@@ -61,7 +61,7 @@ const AirQualityDetails = ({ data, predictions, isPredictionsLoading, name, type
 
   const getAQIMessage = (aqi_category) => {
     if (aqi_category !== "") {
-      return `Air quality is ${aqi_category}`;
+      return `Air Quality is ${aqi_category}`;
     } else {
       return "";
     }
@@ -99,7 +99,7 @@ const AirQualityDetails = ({ data, predictions, isPredictionsLoading, name, type
     const today = new Date().getDay();
 
     return (
-      <div className="absolute top-full left-0 mt-4 flex items-center justify-start w-full">
+      <div className="absolute top-full left-0 mt-6 flex items-center justify-start w-full">
         {[...Array(7)].map((_, index) => {
           const dayIndex = (today + index) % 7;
           const isToday = index === 0;
@@ -110,21 +110,21 @@ const AirQualityDetails = ({ data, predictions, isPredictionsLoading, name, type
           return (
             <div 
               key={index} 
-              className={`flex flex-col items-center mr-2 rounded-md p-1 ${
+              className={`flex flex-col items-center mr-3 rounded-md p-2 ${
                 isToday 
                   ? 'bg-blue-500 text-white' 
                   : 'bg-blue-200 bg-opacity-30 text-white'
               }`}
             >
-              <span className="font-bold" style={{fontSize: `${screenWidth * 0.01}px`}}>{days[dayIndex]}</span>
-              <span style={{fontSize: `${screenWidth * 0.009}px`}}>{date.getDate()}</span>
+              <span className="font-bold" style={{fontSize: `${screenWidth * 0.012}px`}}>{days[dayIndex]}</span>
+              <span style={{fontSize: `${screenWidth * 0.011}px`}}>{date.getDate()}</span>
               {isPredictionsLoading ? (
-                <div className="animate-pulse bg-gray-500 rounded-full mt-1" style={{width: `${screenWidth * 0.025}px`, height: `${screenWidth * 0.025}px`}}></div>
+                <div className="animate-pulse bg-gray-500 rounded-full mt-1" style={{width: `${screenWidth * 0.03}px`, height: `${screenWidth * 0.03}px`}}></div>
               ) : forecast ? (
-                <div className="mt-1">{getAQIIcon(forecast.pm2_5, screenWidth * 0.025)}</div>
+                <div className="mt-1">{getAQIIcon(forecast.pm2_5, screenWidth * 0.03)}</div>
               ) : (
                 <div className="mt-1">
-                  <UnknownAQ width={`${screenWidth * 0.025}px`} height={`${screenWidth * 0.025}px`} />
+                  <UnknownAQ width={`${screenWidth * 0.03}px`} height={`${screenWidth * 0.03}px`} />
                 </div>
               )}
             </div>
@@ -183,7 +183,7 @@ const AirQualityDetails = ({ data, predictions, isPredictionsLoading, name, type
                   </div>
                 </div>
               </div>
-              <div className="flex justify-start items-baseline gap-[11.18px] relative">
+              <div className="flex justify-start items-baseline gap-[11.18px] relative mb-20">
                 <div
                   className={`text-center text-orange-400 font-extrabold font-['Inter']`}
                   style={{fontSize: `${screenWidth * 0.08}px`}}
