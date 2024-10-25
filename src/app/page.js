@@ -99,7 +99,7 @@ const AirQualityDetails = ({ site, predictions, isPredictionsLoading, cohortName
     const today = new Date().getDay();
 
     return (
-      <div className="absolute top-full left-0 mt-4 flex items-center justify-between w-full">
+      <div className="absolute top-full left-0 mt-4 flex items-center justify-start w-full">
         {[...Array(7)].map((_, index) => {
           const dayIndex = (today + index) % 7;
           const isToday = index === 0;
@@ -108,16 +108,23 @@ const AirQualityDetails = ({ site, predictions, isPredictionsLoading, cohortName
           date.setDate(date.getDate() + index);
 
           return (
-            <div key={index} className={`flex flex-col items-center ${isToday ? 'bg-blue-500 text-white rounded-md p-1' : 'text-white'}`}>
-              <span className="text-sm font-bold">{days[dayIndex]}</span>
-              <span className="text-sm">{date.getDate()}</span>
+            <div 
+              key={index} 
+              className={`flex flex-col items-center mr-2 rounded-md p-1 ${
+                isToday 
+                  ? 'bg-blue-500 text-white' 
+                  : 'bg-blue-200 bg-opacity-30 text-white'
+              }`}
+            >
+              <span className="font-bold" style={{fontSize: `${screenWidth * 0.01}px`}}>{days[dayIndex]}</span>
+              <span style={{fontSize: `${screenWidth * 0.009}px`}}>{date.getDate()}</span>
               {isPredictionsLoading ? (
-                <div className="w-10 h-10 animate-pulse bg-gray-500 rounded-full mt-1"></div>
+                <div className="animate-pulse bg-gray-500 rounded-full mt-1" style={{width: `${screenWidth * 0.025}px`, height: `${screenWidth * 0.025}px`}}></div>
               ) : forecast ? (
-                <div className="mt-1">{getAQIIcon(forecast.pm2_5, screenWidth * 0.03)}</div>
+                <div className="mt-1">{getAQIIcon(forecast.pm2_5, screenWidth * 0.025)}</div>
               ) : (
                 <div className="mt-1">
-                  <UnknownAQ width={`${screenWidth * 0.03}px`} height={`${screenWidth * 0.03}px`} />
+                  <UnknownAQ width={`${screenWidth * 0.025}px`} height={`${screenWidth * 0.025}px`} />
                 </div>
               )}
             </div>
@@ -132,7 +139,7 @@ const AirQualityDetails = ({ site, predictions, isPredictionsLoading, cohortName
       className={`w-full h-full px-[5%] pt-[3%] bg-blue-950 border-t-2 border-blue-950 overflow-hidden relative`}
     >
     <div className="absolute top-0 left-0 w-full bg-blue-900 py-2 px-4 z-10">
-        <div className="flex justify-between items-center text-white" style={{fontSize: `${screenWidth * 0.012}px`}}>
+        <div className="flex items-center gap-4 text-white" style={{fontSize: `${screenWidth * 0.012}px`}}>
           <div className="font-bold">Air Quality</div>
           <div>
             {new Date().toLocaleDateString([], {
@@ -151,7 +158,7 @@ const AirQualityDetails = ({ site, predictions, isPredictionsLoading, cohortName
           <div>Cohort: {cohortName}</div>
         </div>
       </div>
-      <div className="w-full h-[75%] flex justify-between items-start gap-1 relative mt-6">
+      <div className="w-full h-[67%] flex justify-between items-start gap-1 relative mt-6">
         <div className="flex justify-between items-start w-full">
           <div className="w-full">
             <div className="flex-col justify-between items-start w-full relative">
@@ -164,13 +171,6 @@ const AirQualityDetails = ({ site, predictions, isPredictionsLoading, cohortName
                       height: `${screenWidth * 0.04}px`,
                     }}
                   >
-                    {/* <Image
-                      src="/wind.png"
-                      alt="Image X"
-                      width={screenWidth * 0.04}
-                      height={screenWidth * 0.04}
-                      style={{ objectFit: "contain" }}
-                    /> */}
                     <WindIcon
                     width={`${screenWidth * 0.035}`}
                     height={`${screenWidth * 0.035}`} />
