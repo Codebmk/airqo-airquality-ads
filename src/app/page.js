@@ -54,12 +54,11 @@ const Footer = () => {
   );
 };
 
-const AirQualityDetails = (site) => {
+const AirQualityDetails = ({ site }) => {
   const window = useWindowSize();
   const screenWidth = Math.floor(window.width);
-  const [selectedSite, setSelectedSite] = useState(null);
 
-  const getAQIMessage = (aqi_category, healthTip) => {
+  const getAQIMessage = (aqi_category) => {
     if (aqi_category !== "") {
       return `Air quality is ${aqi_category}`;
     } else {
@@ -94,111 +93,105 @@ const AirQualityDetails = (site) => {
     );
   };
 
-  useEffect(() => {
-    if (site) {
-      setSelectedSite(site.site);
-    }
-  }, [site]);
-
   return (
     <div
       className={`w-full h-full px-[5%] pt-[3%] bg-blue-950 border-t-2 border-blue-950 overflow-hidden relative`}
     >
       <div className="w-full h-[75%] flex justify-between items-start gap-1 relative">
         <div className="flex justify-between items-start w-full">
-        <div className="w-full">
-          <div className="flex justify-start items-start divide-x-2 divide-white">
-            <div
-              className={`text-neutral-50 font-medium font-['Inter'] pr-5 leading-tight`}
-              style={{fontSize: `${screenWidth * 0.015}px`}}
-            >
-              {new Date().toLocaleDateString([], {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </div>
-            <div
-              className={`text-neutral-50 font-medium font-['Inter'] leading-tight pl-5`}
-              style={{fontSize: `${screenWidth * 0.015}px`}}
-            >
-              {new Date().toLocaleTimeString([], {
-                hour: "numeric",
-                minute: "2-digit",
-              })}
-            </div>
-          </div>
-          <div
-            className={`text-neutral-50 font-bold font-['Inter'] leading-tight`}
-            style={{fontSize: `${screenWidth * 0.05}px`}}
-          >
-            Air Quality
-          </div>
-          <div className="flex-col justify-between items-start w-full">
-            <div className="self-stretch flex-col justify-start items-start flex">
-              <div className="flex justify-start items-center gap-4">
-                <div
-                  className="p-1 bg-blue-100 rounded-full flex justify-center items-center"
-                  style={{
-                    width: `${screenWidth * 0.04}px`,
-                    height: `${screenWidth * 0.04}px`,
-                  }}
-                >
-                  {/* <Image
-                    src="/wind.png"
-                    alt="Image X"
-                    width={screenWidth * 0.04}
-                    height={screenWidth * 0.04}
-                    style={{ objectFit: "contain" }}
-                  /> */}
-                  <WindIcon
-                  width={`${screenWidth * 0.035}`}
-                  height={`${screenWidth * 0.035}`} />
-                </div>
-                <div
-                  className={`text-right text-neutral-50 font-medium font-['Inter'] leading-tight`}
-                  style={{fontSize: `${screenWidth * 0.03}px`}}
-                >
-                  PM2.5
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-start items-baseline gap-[11.18px]">
+          <div className="w-full">
+            <div className="flex justify-start items-start divide-x-2 divide-white">
               <div
-                className={`text-center text-orange-400 font-extrabold font-['Inter']`}
-                style={{fontSize: `${screenWidth * 0.08}px`}}
+                className={`text-neutral-50 font-medium font-['Inter'] pr-5 leading-tight`}
+                style={{fontSize: `${screenWidth * 0.015}px`}}
               >
-                {selectedSite && selectedSite.pm2_5
-                  ? selectedSite.pm2_5.value.toFixed(2)
-                  : "--"}
+                {new Date().toLocaleDateString([], {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
               </div>
-              <div className="text-right">
-                <span
-                  className={`text-orange-400 font-bold font-['Inter']`}
-                  style={{fontSize: `${screenWidth * 0.03}px`}}
-                >
-                  μg/m
-                </span>
-                <span
-                  className={`text-orange-400 font-medium font-['Inter']`}
-                  style={{fontSize: `${screenWidth * 0.03}px`}}
-                >
-                  3
-                </span>
+              <div
+                className={`text-neutral-50 font-medium font-['Inter'] leading-tight pl-5`}
+                style={{fontSize: `${screenWidth * 0.015}px`}}
+              >
+                {new Date().toLocaleTimeString([], {
+                  hour: "numeric",
+                  minute: "2-digit",
+                })}
               </div>
             </div>
-          </div>
+            <div
+              className={`text-neutral-50 font-bold font-['Inter'] leading-tight`}
+              style={{fontSize: `${screenWidth * 0.05}px`}}
+            >
+              Air Quality
+            </div>
+            <div className="flex-col justify-between items-start w-full">
+              <div className="self-stretch flex-col justify-start items-start flex">
+                <div className="flex justify-start items-center gap-4">
+                  <div
+                    className="p-1 bg-blue-100 rounded-full flex justify-center items-center"
+                    style={{
+                      width: `${screenWidth * 0.04}px`,
+                      height: `${screenWidth * 0.04}px`,
+                    }}
+                  >
+                    {/* <Image
+                      src="/wind.png"
+                      alt="Image X"
+                      width={screenWidth * 0.04}
+                      height={screenWidth * 0.04}
+                      style={{ objectFit: "contain" }}
+                    /> */}
+                    <WindIcon
+                    width={`${screenWidth * 0.035}`}
+                    height={`${screenWidth * 0.035}`} />
+                  </div>
+                  <div
+                    className={`text-right text-neutral-50 font-medium font-['Inter'] leading-tight`}
+                    style={{fontSize: `${screenWidth * 0.03}px`}}
+                  >
+                    PM2.5
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-start items-baseline gap-[11.18px]">
+                <div
+                  className={`text-center text-orange-400 font-extrabold font-['Inter']`}
+                  style={{fontSize: `${screenWidth * 0.08}px`}}
+                >
+                  {site && site.pm2_5
+                    ? site.pm2_5.value.toFixed(2)
+                    : "--"}
+                </div>
+                <div className="text-right">
+                  <span
+                    className={`text-orange-400 font-bold font-['Inter']`}
+                    style={{fontSize: `${screenWidth * 0.03}px`}}
+                  >
+                    μg/m
+                  </span>
+                  <span
+                    className={`text-orange-400 font-medium font-['Inter']`}
+                    style={{fontSize: `${screenWidth * 0.03}px`}}
+                  >
+                    3
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
           <div className="w-full justify-end items-start flex py-[1%]">
-          {selectedSite && selectedSite.pm2_5 && (
-            <div
-              className={`${`w-[${screenWidth * 0.20}px] h-[${screenWidth * 0.20}px]`} justify-center items-center flex`}
-            >
-              {getAQIIcon(selectedSite.pm2_5.value)}
-            </div>
-          )}
-        </div>
+            {site && site.pm2_5 && (
+              <div
+                className={`${`w-[${screenWidth * 0.20}px] h-[${screenWidth * 0.20}px]`} justify-center items-center flex`}
+              >
+                {getAQIIcon(site.pm2_5.value)}
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <div style={{
@@ -210,17 +203,14 @@ const AirQualityDetails = (site) => {
       <Image src={AnalyticsQR} width={screenWidth*0.1} height={screenWidth*0.1} alt="analytics qr code" />
       </div>
       <div className="h-auto w-full">
-      <div
-        className={`w-full text-neutral-50 leading-snug font-semibold font-['Inter']`}
-        style={{fontSize: `${screenWidth * 0.02}px`}}
-      >
-        {selectedSite && selectedSite.aqi_category
-          ? getAQIMessage(
-              selectedSite.aqi_category,
-              selectedSite.health_tips[0].description
-            )
-          : ""}
-      </div>
+        <div
+          className={`w-full text-neutral-50 leading-snug font-semibold font-['Inter']`}
+          style={{fontSize: `${screenWidth * 0.02}px`}}
+        >
+          {site && site.aqi_category
+            ? getAQIMessage(site.aqi_category)
+            : ""}
+        </div>
         <hr className="pb-4 mt-5" />
         <div className="h-[99.60px] flex-col justify-start items-start gap-4 flex">
           <div className="justify-center items-center gap-5 inline-flex">
@@ -237,8 +227,8 @@ const AirQualityDetails = (site) => {
               className={`text-neutral-50 leading-loose font-bold font-['Inter']`}
               style={{fontSize: `${screenWidth * 0.02}px`}}
             >
-              {selectedSite && selectedSite.siteDetails
-                ? selectedSite.siteDetails.search_name
+              {site && site.deviceDetails
+                ? site.deviceDetails.name
                 : "--"}
             </div>
           </div>
@@ -255,24 +245,29 @@ export default function Home() {
 
   useEffect(() => {
     const fetchCohortId = async () => {
-      const jwtToken = process.env.NEXT_PUBLIC_JWT_TOKEN;
+      const accessToken = process.env.NEXT_PUBLIC_API_TOKEN;
       try {
-        const cohorts = await getCohorts(jwtToken);
-        const cohortName = pathname.slice(1); // Remove the leading '/'
-        
-        let matchedCohort;
-        if (cohortName) {
-          matchedCohort = cohorts.find(cohort => cohort.name.toLowerCase() === cohortName.toLowerCase());
-        } else {
-          // If no cohort name is provided, use the default "car_free_day_demo"
-          matchedCohort = cohorts.find(cohort => cohort.name.toLowerCase() === "car_free_day_demo");
-        }
+        const response = await getCohorts(accessToken);
+        if (response.success && Array.isArray(response.cohorts)) {
+          const cohorts = response.cohorts;
+          const cohortName = pathname.slice(1); // Remove the leading '/'
+          
+          let matchedCohort;
+          if (cohortName) {
+            matchedCohort = cohorts.find(cohort => cohort.name.toLowerCase() === cohortName.toLowerCase());
+          } else {
+            // If no cohort name is provided, use the default "car_free_day_demo"
+            matchedCohort = cohorts.find(cohort => cohort.name.toLowerCase() === "car_free_day_demo");
+          }
 
-        if (matchedCohort) {
-          setCohortId(matchedCohort._id);
+          if (matchedCohort) {
+            setCohortId(matchedCohort._id);
+          } else {
+            console.error(`Cohort "${cohortName || 'car_free_day_demo'}" not found`);
+            // You might want to handle this error case, perhaps by setting a fallback cohort ID
+          }
         } else {
-          console.error(`Cohort "${cohortName || 'car_free_day_demo'}" not found`);
-          // You might want to handle this error case, perhaps by setting a fallback cohort ID
+          console.error("Invalid response format from getCohorts");
         }
       } catch (error) {
         console.error("Error fetching cohorts:", error);
@@ -287,9 +282,9 @@ export default function Home() {
       if (!cohortId) return;
 
       try {
-        const accessToken = process.env.NEXT_PUBLIC_ACCESS_TOKEN;
+        const accessToken = process.env.NEXT_PUBLIC_API_TOKEN;
         const response = await getAQDataApi(accessToken, cohortId);
-        if (response.success) {
+        if (response.measurements && response.measurements.length > 0) {
           // choose random site
           const randomIndex = Math.floor(
             Math.random() * response.measurements.length
@@ -298,7 +293,7 @@ export default function Home() {
           if (!selectedSite) {
             setSelectedSite(randomSite);
           } else {
-            while (randomSite.site_id === selectedSite?.site_id) {
+            while (randomSite.device_id === selectedSite?.device_id) {
               randomSite =
                 response.measurements[
                   Math.floor(Math.random() * response.measurements.length)
