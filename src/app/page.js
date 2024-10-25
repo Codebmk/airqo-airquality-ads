@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getAQDataApi } from "@utils/apis";
+import { getAQDataApi, getCohorts } from "@utils/apis";
 import { useWindowSize } from "@utils/windowSize";
+import { usePathname } from 'next/navigation';
 import Image from "next/image";
 import GoodAir from "@icons/GoodAir";
 import Hazardous from "@icons/Hazardous";
@@ -249,12 +250,45 @@ const AirQualityDetails = (site) => {
 
 export default function Home() {
   const [selectedSite, setSelectedSite] = useState(null);
+  const [cohortId, setCohortId] = useState(null);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const fetchCohortId = async () => {
+      const jwtToken = process.env.NEXT_PUBLIC_JWT_TOKEN;
+      try {
+        const cohorts = await getCohorts(jwtToken);
+        const cohortName = pathname.slice(1); // Remove the leading '/'
+        
+        let matchedCohort;
+        if (cohortName) {
+          matchedCohort = cohorts.find(cohort => cohort.name.toLowerCase() === cohortName.toLowerCase());
+        } else {
+          // If no cohort name is provided, use the default "car_free_day_demo"
+          matchedCohort = cohorts.find(cohort => cohort.name.toLowerCase() === "car_free_day_demo");
+        }
+
+        if (matchedCohort) {
+          setCohortId(matchedCohort._id);
+        } else {
+          console.error(`Cohort "${cohortName || 'car_free_day_demo'}" not found`);
+          // You might want to handle this error case, perhaps by setting a fallback cohort ID
+        }
+      } catch (error) {
+        console.error("Error fetching cohorts:", error);
+      }
+    };
+
+    fetchCohortId();
+  }, [pathname]);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!cohortId) return;
+
       try {
-        const token = process.env.NEXT_PUBLIC_API_TOKEN;
-        const response = await getAQDataApi(token);
+        const accessToken = process.env.NEXT_PUBLIC_ACCESS_TOKEN;
+        const response = await getAQDataApi(accessToken, cohortId);
         if (response.success) {
           // choose random site
           const randomIndex = Math.floor(
@@ -278,15 +312,17 @@ export default function Home() {
       }
     };
 
-    fetchData();
-    const interval = setInterval(() => {
+    if (cohortId) {
       fetchData();
-    }, 10000);
+      const interval = setInterval(() => {
+        fetchData();
+      }, 10000);
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+      return () => {
+        clearInterval(interval);
+      };
+    }
+  }, [cohortId]);
 
   return (
     <BoxWrapper>
