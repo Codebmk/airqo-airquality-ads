@@ -299,7 +299,7 @@ const AirQualityDetails = ({
               />
             </div>
             <div
-              className={`text-neutral-50 leading-loose font-bold font-['Inter']`}
+              className={`text-neutral-50 leading-loose font-bold font-['Inter'] capitalize`}
               style={{ fontSize: `${screenWidth * 0.02}px` }}
             >
               {data && data.siteDetails ? (data.siteDetails.search_name) : "--"}
