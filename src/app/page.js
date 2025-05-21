@@ -302,7 +302,7 @@ const AirQualityDetails = ({
               className={`text-neutral-50 leading-loose font-bold font-['Inter']`}
               style={{ fontSize: `${screenWidth * 0.02}px` }}
             >
-              {data && data.siteDetails ? data.siteDetails.name : "--"}
+              {data && data.siteDetails ? (data.siteDetails.search_name) : "--"}
             </div>
           </div>
         </div>
